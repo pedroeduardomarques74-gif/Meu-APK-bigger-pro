@@ -81,7 +81,7 @@ if old_row not in s:
 s=s.replace(old_row,new_row,1)
 
 old_icon = '''    String icon(Node n){ String x=n.name.toLowerCase(Locale.ROOT); if(n.mime!=null&&n.mime.startsWith("image/"))return "🖼"; if(n.mime!=null&&n.mime.startsWith("video/"))return "🎬"; if(n.mime!=null&&n.mime.startsWith("audio/"))return "🎵"; if(x.endsWith(".apk"))return "🤖"; if(x.endsWith(".zip")||x.endsWith(".rar")||x.endsWith(".7z"))return "🗜"; return "📄"; }'''
-new_icon = '''    String icon(Node n){
+new_icon = r'''    String icon(Node n){
         String x=n.name==null?"":n.name.toLowerCase(Locale.ROOT);
         String m=n.mime==null?"":n.mime.toLowerCase(Locale.ROOT);
         if(m.startsWith("image/")||x.matches(".*\\.(jpg|jpeg|png|gif|webp|bmp|heic|svg)$"))return "🖼️";
