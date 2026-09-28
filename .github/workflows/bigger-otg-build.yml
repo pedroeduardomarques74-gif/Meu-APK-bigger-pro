@@ -33,7 +33,10 @@ jobs:
       - name: Aplicar correção v5.1
         run: python3 v5/patch_v51.py
 
-      - name: Aplicar correção v5.2\n        run: python3 v5/patch_v52.py\n\n      - name: Configurar Android SDK
+      - name: Aplicar correção v5.2
+        run: python3 v5/patch_v52.py
+
+      - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
