@@ -66,39 +66,38 @@ if marker not in s:
 s = s.replace(marker, helpers + marker, 1)
 
 # Troca o ícone genérico da linha por visual inteligente.
-patterns = [
-    r'TextView\s+(\w+)\s*=\s*txt\(\s*n\.dir\s*\?\s*"📁"\s*:\s*"🤖"\s*,[^;]+;\s*r\.addView\(\1\);',
-    r'TextView\s+(\w+)\s*=\s*txt\(\s*n\.dir\s*\?\s*"📁"\s*:\s*"📄"\s*,[^;]+;\s*r\.addView\(\1\);',
-    r'TextView\s+(\w+)\s*=\s*txt\(\s*n\.dir\s*\?\s*"📁"\s*:\s*"[^"]+"\s*,[^;]+;\s*r\.addView\(\1\);'
-]
-replaced = False
-for pat in patterns:
-    ns, count = re.subn(
-        pat,
-        'View fileVisualView=fileVisual(n); r.addView(fileVisualView,new LinearLayout.LayoutParams(dp(38),dp(38)));',
-        s,
-        count=1,
-        flags=re.S
-    )
-    if count:
-        s = ns
-        replaced = True
-        break
+old_row = '''            TextView nm=txt((n.dir?"📁  ":icon(n)+"  ")+n.name,15,Color.WHITE,n.dir); mid.addView(nm);'''
+new_row = '''            TextView nm=txt((n.dir?"📁  ":icon(n)+"  ")+n.name,15,Color.WHITE,n.dir);
+            android.graphics.drawable.Drawable realApkIcon=extractedApkIcon(n);
+            if(realApkIcon!=null){
+                realApkIcon.setBounds(0,0,dp(28),dp(28));
+                nm.setCompoundDrawables(realApkIcon,null,null,null);
+                nm.setCompoundDrawablePadding(dp(8));
+                nm.setText(n.name);
+            }
+            mid.addView(nm);'''
+if old_row not in s:
+    raise SystemExit("Linha visual da lista de arquivos não encontrada")
+s=s.replace(old_row,new_row,1)
 
-if not replaced:
-    # fallback: procura a expressão ternária de pasta/arquivo e troca somente o txt()
-    ns, count = re.subn(
-        r'txt\(\s*n\.dir\s*\?\s*"📁"\s*:\s*"[^"]+"\s*,\s*([0-9]+)\s*,\s*Color\.WHITE\s*,\s*false\s*\)',
-        'txt(fileTypeEmoji(n), \\1, Color.WHITE, false)',
-        s,
-        count=1
-    )
-    if count:
-        s = ns
-        replaced = True
-
-if not replaced:
-    raise SystemExit("Não encontrei o ícone genérico da lista de arquivos para substituir")
+old_icon = '''    String icon(Node n){ String x=n.name.toLowerCase(Locale.ROOT); if(n.mime!=null&&n.mime.startsWith("image/"))return "🖼"; if(n.mime!=null&&n.mime.startsWith("video/"))return "🎬"; if(n.mime!=null&&n.mime.startsWith("audio/"))return "🎵"; if(x.endsWith(".apk"))return "🤖"; if(x.endsWith(".zip")||x.endsWith(".rar")||x.endsWith(".7z"))return "🗜"; return "📄"; }'''
+new_icon = '''    String icon(Node n){
+        String x=n.name==null?"":n.name.toLowerCase(Locale.ROOT);
+        String m=n.mime==null?"":n.mime.toLowerCase(Locale.ROOT);
+        if(m.startsWith("image/")||x.matches(".*\\.(jpg|jpeg|png|gif|webp|bmp|heic|svg)$"))return "🖼️";
+        if(m.startsWith("video/")||x.matches(".*\\.(mp4|mkv|avi|mov|wmv|webm|m4v|ts)$"))return "🎬";
+        if(m.startsWith("audio/")||x.matches(".*\\.(mp3|wav|flac|aac|ogg|m4a|wma)$"))return "🎵";
+        if(x.endsWith(".apk")||m.contains("android.package"))return "📦";
+        if(x.endsWith(".pdf")||m.contains("pdf"))return "📕";
+        if(x.matches(".*\\.(zip|rar|7z|tar|gz|bz2|xz)$")||m.contains("zip")||m.contains("compressed"))return "🗜️";
+        if(x.matches(".*\\.(doc|docx|odt)$"))return "📝";
+        if(x.matches(".*\\.(xls|xlsx|ods|csv)$"))return "📊";
+        if(x.matches(".*\\.(ppt|pptx|odp)$"))return "📽️";
+        return "📄";
+    }'''
+if old_icon not in s:
+    raise SystemExit("Método icon original não encontrado")
+s=s.replace(old_icon,new_icon,1)
 
 p.write_text(s)
 
