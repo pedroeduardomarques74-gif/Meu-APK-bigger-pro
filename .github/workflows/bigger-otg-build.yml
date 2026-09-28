@@ -1,4 +1,4 @@
-name: BIGGER OTG v2 - GERAR APK
+name: BIGGER OTG v3 - GERAR APK
 on:
   workflow_dispatch:
   push:
@@ -15,14 +15,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Restaurar projeto v2
+      - name: Restaurar projeto v3
         run: |
           mkdir -p buildsrc
-          cat v2chunks/chunk_*.txt > bigger-otg-v2.b64
-          test "$(wc -c < bigger-otg-v2.b64)" -eq 16308
-          base64 -d bigger-otg-v2.b64 > bigger-otg-v2.zip
-          unzip -t bigger-otg-v2.zip
-          unzip -q bigger-otg-v2.zip -d buildsrc
+          cat v3chunks/chunk_*.txt > bigger-otg-v3.b64
+          test "$(wc -c < bigger-otg-v3.b64)" -eq 18948
+          base64 -d bigger-otg-v3.b64 > bigger-otg-v3.zip
+          unzip -t bigger-otg-v3.zip
+          unzip -q bigger-otg-v3.zip -d buildsrc
 
       - name: Configurar Android SDK
         run: |
@@ -43,13 +43,13 @@ jobs:
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           mkdir -p output
-          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v2.apk
-          unzip -t output/BIGGER-OTG-v2.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v2.apk
-          ls -lh output/BIGGER-OTG-v2.apk
-          sha256sum output/BIGGER-OTG-v2.apk
+          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v3.apk
+          unzip -t output/BIGGER-OTG-v3.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v3.apk
+          ls -lh output/BIGGER-OTG-v3.apk
+          sha256sum output/BIGGER-OTG-v3.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BIGGER-OTG-v2-APK
-          path: output/BIGGER-OTG-v2.apk
+          name: BIGGER-OTG-v3-APK
+          path: output/BIGGER-OTG-v3.apk
