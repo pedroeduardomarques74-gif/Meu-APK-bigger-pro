@@ -1,4 +1,4 @@
-name: BIGGER OTG v6.4 - GERAR APK
+name: BIGGER OTG v6.5 - GERAR APK
 on:
   workflow_dispatch:
   push:
@@ -51,6 +51,9 @@ jobs:
       - name: Aplicar correção v6.4
         run: python3 v6/patch_v64.py
 
+      - name: Aplicar correção v6.5
+        run: python3 v6/patch_v65.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
@@ -70,13 +73,13 @@ jobs:
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           mkdir -p output
-          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v6.4.apk
-          unzip -t output/BIGGER-OTG-v6.4.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v6.4.apk
-          ls -lh output/BIGGER-OTG-v6.4.apk
-          sha256sum output/BIGGER-OTG-v6.4.apk
+          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v6.5.apk
+          unzip -t output/BIGGER-OTG-v6.5.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v6.5.apk
+          ls -lh output/BIGGER-OTG-v6.5.apk
+          sha256sum output/BIGGER-OTG-v6.5.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BIGGER-OTG-v6.4-APK
-          path: output/BIGGER-OTG-v6.4.apk
+          name: BIGGER-OTG-v6.5-APK
+          path: output/BIGGER-OTG-v6.5.apk
