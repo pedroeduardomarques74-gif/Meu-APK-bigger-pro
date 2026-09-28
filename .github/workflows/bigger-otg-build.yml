@@ -48,7 +48,10 @@ jobs:
       - name: Aplicar melhorias v6.3
         run: python3 v6/patch_v63.py
 
-      - name: Aplicar correção v6.4\n        run: python3 v6/patch_v64.py\n\n      - name: Configurar Android SDK
+      - name: Aplicar correção v6.4
+        run: python3 v6/patch_v64.py
+
+      - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
