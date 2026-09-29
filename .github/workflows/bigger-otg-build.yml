@@ -66,6 +66,9 @@ jobs:
       - name: Aplicar hardening compartilhamento v7
         run: python3 v7/patch_share_v7.py
 
+      - name: Aplicar compatibilidade v7
+        run: python3 v7/patch_compat_v7.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
@@ -79,7 +82,13 @@ jobs:
 
       - name: Android Lint
         working-directory: buildsrc
-        run: gradle :app:lintDebug --stacktrace
+        run: |
+          set +e
+          gradle :app:lintDebug --stacktrace
+          code=$?
+          echo "===== RELATORIO LINT COMPLETO ====="
+          cat app/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt || true
+          exit $code
 
       - name: Compilar APK
         working-directory: buildsrc
