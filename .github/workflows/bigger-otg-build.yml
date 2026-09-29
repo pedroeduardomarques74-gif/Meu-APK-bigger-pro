@@ -69,6 +69,9 @@ jobs:
       - name: Aplicar compatibilidade v7
         run: python3 v7/patch_compat_v7.py
 
+      - name: Corrigir lint v7
+        run: python3 v7/patch_lint_v7.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
