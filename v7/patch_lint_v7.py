@@ -99,3 +99,24 @@ x=x.replace("    void registerUsbReceiver() {",
 '''    @android.annotation.SuppressLint("UnspecifiedRegisterReceiverFlag")
     void registerUsbReceiver() {''',1)
 p.write_text(x)
+
+
+# Garante helper de URI no fim das duas Activities, independente da formatação.
+for fp in [
+    Path("buildsrc/app/src/main/java/com/grupobigger/biggerotg/MainActivity.java"),
+    Path("buildsrc/app/src/main/java/com/grupobigger/biggerotg/AppsActivity.java")
+]:
+    x=fp.read_text()
+    if "void takePersistablePermissionChecked(Uri uri,int flags)" not in x:
+        helper='''
+
+    @android.annotation.SuppressLint("WrongConstant")
+    void takePersistablePermissionChecked(Uri uri,int flags){
+        int allowed=flags & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        if(allowed!=0)getContentResolver().takePersistableUriPermission(uri,allowed);
+    }
+'''
+        pos=x.rfind("}")
+        if pos<0: raise SystemExit("Fechamento de classe não encontrado: "+str(fp))
+        x=x[:pos]+helper+x[pos:]
+        fp.write_text(x)
