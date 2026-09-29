@@ -72,6 +72,9 @@ jobs:
       - name: Corrigir lint v7
         run: python3 v7/patch_lint_v7.py
 
+      - name: Eliminar catches vazios v7
+        run: python3 v7/patch_no_empty_catches_v7.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
