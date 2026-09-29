@@ -49,7 +49,7 @@ public class BiggerApp extends Application {
         File f=new File(dir,"crash-"+System.currentTimeMillis()+".log");
         String action="";
         try{ action=c.getSharedPreferences("bigger_diag",MODE_PRIVATE).getString("last_action",""); }
-        catch(Throwable e){Log.w(TAG_CRASH,"Falha ao ler última ação",e);}
+        catch(Throwable prefErr){Log.w(TAG_CRASH,"Falha ao ler última ação",prefErr);}
         try(PrintWriter w=new PrintWriter(new BufferedWriter(new FileWriter(f)))){
             w.println("Data: "+now());
             w.println("Android: "+Build.VERSION.RELEASE+" (SDK "+Build.VERSION.SDK_INT+")");
