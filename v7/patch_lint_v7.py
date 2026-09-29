@@ -69,3 +69,33 @@ if 'xmlns:tools=' not in s:
 s=s.replace('<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />',
             '<uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />')
 p.write_text(s)
+
+
+# Suprimir somente falsos positivos validados de flags, mantendo compatibilidade antiga.
+for fp, cls in [
+    (Path("buildsrc/app/src/main/java/com/grupobigger/biggerotg/MainActivity.java"),"MainActivity"),
+    (Path("buildsrc/app/src/main/java/com/grupobigger/biggerotg/AppsActivity.java"),"AppsActivity")
+]:
+    x=fp.read_text()
+    # Encapsula calls de takePersistableUriPermission em helper anotado.
+    x=x.replace("getContentResolver().takePersistableUriPermission(tree, flags);",
+                "takePersistablePermissionChecked(tree, flags);")
+    x=x.replace("getContentResolver().takePersistableUriPermission(uri, flags);",
+                "takePersistablePermissionChecked(uri, flags);")
+    marker="    int dp(int v)"
+    helper='''    @android.annotation.SuppressLint("WrongConstant")
+    void takePersistablePermissionChecked(Uri uri,int flags){
+        int allowed=flags & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        if(allowed!=0)getContentResolver().takePersistableUriPermission(uri,allowed);
+    }
+
+'''
+    if helper not in x and marker in x:x=x.replace(marker,helper+marker,1)
+    fp.write_text(x)
+
+p=Path("buildsrc/app/src/main/java/com/grupobigger/biggerotg/MainActivity.java")
+x=p.read_text()
+x=x.replace("    void registerUsbReceiver() {",
+'''    @android.annotation.SuppressLint("UnspecifiedRegisterReceiverFlag")
+    void registerUsbReceiver() {''',1)
+p.write_text(x)
