@@ -32,12 +32,14 @@ jobs:
       - run: python3 v7/patch_share_v7.py
       - run: python3 v7/patch_compat_v7.py
       - run: python3 v7/patch_lint_v7.py
+      - run: python3 v7/patch_no_empty_catches_v7.py
       - name: Preparar snapshot
         run: |
           mkdir -p audit_snapshot
           cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/MainActivity.java audit_snapshot/
           cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/AppsActivity.java audit_snapshot/
           cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/ShareReceiverActivity.java audit_snapshot/
+          cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/BiggerApp.java audit_snapshot/
           cp buildsrc/app/src/main/AndroidManifest.xml audit_snapshot/
           cp buildsrc/app/build.gradle audit_snapshot/app-build.gradle
           cp buildsrc/build.gradle audit_snapshot/root-build.gradle
