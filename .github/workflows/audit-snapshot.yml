@@ -1,0 +1,46 @@
+name: BIGGER OTG - SNAPSHOT AUDITORIA
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restaurar base v3
+        run: |
+          mkdir -p buildsrc
+          cat v3chunks/chunk_*.txt > bigger-otg-v3.b64
+          test "$(wc -c < bigger-otg-v3.b64)" -eq 18948
+          base64 -d bigger-otg-v3.b64 > bigger-otg-v3.zip
+          unzip -q bigger-otg-v3.zip -d buildsrc
+      - run: python3 v5/patch_v4.py
+      - run: python3 v5/patch_v5.py
+      - run: python3 v5/patch_v51.py
+      - run: python3 v5/patch_v52.py
+      - run: python3 v6/patch_layout_v6.py
+      - run: python3 v6/patch_v61.py
+      - run: python3 v6/patch_v62.py
+      - run: python3 v6/patch_v63.py
+      - run: python3 v6/patch_v64.py
+      - run: python3 v6/patch_v65.py
+      - run: python3 v6/patch_v66.py
+      - name: Preparar snapshot
+        run: |
+          mkdir -p audit_snapshot
+          cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/MainActivity.java audit_snapshot/
+          cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/AppsActivity.java audit_snapshot/
+          cp buildsrc/app/src/main/java/com/grupobigger/biggerotg/ShareReceiverActivity.java audit_snapshot/
+          cp buildsrc/app/src/main/AndroidManifest.xml audit_snapshot/
+          cp buildsrc/app/build.gradle audit_snapshot/app-build.gradle
+          cp buildsrc/build.gradle audit_snapshot/root-build.gradle
+          cp buildsrc/gradle.properties audit_snapshot/
+          cp buildsrc/app/src/main/res/values/styles.xml audit_snapshot/
+          if [ -d buildsrc/app/src/main/res/xml ]; then cp -r buildsrc/app/src/main/res/xml audit_snapshot/xml; fi
+          grep -RInE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}|getSharedPreferences|openInputStream|openOutputStream|DocumentsContract|Thread|Executor|Handler|Bitmap|Drawable|registerReceiver|unregisterReceiver|onCreate|onResume|onDestroy|onNewIntent|ACTION_' audit_snapshot > audit_snapshot/static-hotspots.txt || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BIGGER-OTG-AUDIT-SNAPSHOT
+          path: audit_snapshot
