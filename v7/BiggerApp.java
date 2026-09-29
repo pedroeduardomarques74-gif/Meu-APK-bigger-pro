@@ -21,6 +21,8 @@ public class BiggerApp extends Application {
             if(previous!=null) previous.uncaughtException(thread,error);
         });
         pruneOldLogs(this);
+        pruneTempCache(new File(getCacheDir(),"shared_incoming"),72L*60L*60L*1000L);
+        pruneTempCache(new File(getCacheDir(),"extracted_apks"),72L*60L*60L*1000L);
     }
 
     public static void logNonFatal(Context c,String tag,String action,Throwable e){
@@ -46,7 +48,8 @@ public class BiggerApp extends Application {
         if(!dir.exists()&&!dir.mkdirs()) return;
         File f=new File(dir,"crash-"+System.currentTimeMillis()+".log");
         String action="";
-        try{ action=c.getSharedPreferences("bigger_diag",MODE_PRIVATE).getString("last_action",""); }catch(Throwable ignored){}
+        try{ action=c.getSharedPreferences("bigger_diag",MODE_PRIVATE).getString("last_action",""); }
+        catch(Throwable e){Log.w(TAG_CRASH,"Falha ao ler última ação",e);}
         try(PrintWriter w=new PrintWriter(new BufferedWriter(new FileWriter(f)))){
             w.println("Data: "+now());
             w.println("Android: "+Build.VERSION.RELEASE+" (SDK "+Build.VERSION.SDK_INT+")");
@@ -65,8 +68,31 @@ public class BiggerApp extends Application {
             File[] fs=dir.listFiles((d,n)->n.startsWith("crash-")&&n.endsWith(".log"));
             if(fs==null||fs.length<=8)return;
             Arrays.sort(fs,Comparator.comparingLong(File::lastModified).reversed());
-            for(int i=8;i<fs.length;i++) try{fs[i].delete();}catch(Throwable ignored){}
+            for(int i=8;i<fs.length;i++) try{fs[i].delete();}catch(Throwable e){Log.w(TAG_CRASH,"Falha ao apagar log antigo",e);}
         }catch(Throwable e){Log.e(TAG_CRASH,"Falha ao limpar logs",e);}
+    }
+
+    static void pruneTempCache(File dir,long maxAge){
+        try{
+            if(dir==null||!dir.exists())return;
+            long cutoff=System.currentTimeMillis()-maxAge;
+            File[] files=dir.listFiles();
+            if(files==null)return;
+            for(File f:files){
+                try{
+                    if(f.lastModified()<cutoff)deleteRecursively(f);
+                }catch(Throwable e){Log.w(TAG_CRASH,"Falha ao limpar cache temporário",e);}
+            }
+        }catch(Throwable e){Log.w(TAG_CRASH,"Falha ao varrer cache temporário",e);}
+    }
+
+    static void deleteRecursively(File f){
+        if(f==null||!f.exists())return;
+        if(f.isDirectory()){
+            File[] children=f.listFiles();
+            if(children!=null)for(File c:children)deleteRecursively(c);
+        }
+        if(!f.delete())Log.w(TAG_CRASH,"Não foi possível apagar cache: "+f.getName());
     }
 
     static String now(){return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",Locale.US).format(new Date());}
