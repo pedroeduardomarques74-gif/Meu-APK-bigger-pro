@@ -27,6 +27,11 @@ jobs:
       - run: python3 v6/patch_v64.py
       - run: python3 v6/patch_v65.py
       - run: python3 v6/patch_v66.py
+      - run: python3 v7/patch_core_v7.py
+      - run: python3 v7/patch_apps_v7.py
+      - run: python3 v7/patch_share_v7.py
+      - run: python3 v7/patch_compat_v7.py
+      - run: python3 v7/patch_lint_v7.py
       - name: Preparar snapshot
         run: |
           mkdir -p audit_snapshot
@@ -40,6 +45,7 @@ jobs:
           cp buildsrc/app/src/main/res/values/styles.xml audit_snapshot/
           if [ -d buildsrc/app/src/main/res/xml ]; then cp -r buildsrc/app/src/main/res/xml audit_snapshot/xml; fi
           grep -RInE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}|getSharedPreferences|openInputStream|openOutputStream|DocumentsContract|Thread|Executor|Handler|Bitmap|Drawable|registerReceiver|unregisterReceiver|onCreate|onResume|onDestroy|onNewIntent|ACTION_' audit_snapshot > audit_snapshot/static-hotspots.txt || true
+          grep -RInE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}' audit_snapshot/*.java > audit_snapshot/empty-catches.txt || true
       - uses: actions/upload-artifact@v4
         with:
           name: BIGGER-OTG-AUDIT-SNAPSHOT
