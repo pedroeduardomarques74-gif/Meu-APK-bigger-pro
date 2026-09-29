@@ -36,7 +36,7 @@ s=re.sub(r'int flags\s*=\s*data\.getFlags\(\)\s*&\s*\([^;]+\);',
 '''int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);''',s)
 
 # Typeface constants
-s=s.replace('setTypeface(null,1)','setTypeface(null,Typeface.BOLD)')
+s=s.replace('setTypeface(null,1)','setTypeface(null,android.graphics.Typeface.BOLD)')
 p.write_text(s)
 
 # AppsActivity
@@ -46,7 +46,7 @@ s=re.sub(r'!DocumentsContract\.isTreeUri\(([^)]+)\)',
          r'(Build.VERSION.SDK_INT>=24&&!DocumentsContract.isTreeUri(\1))',s)
 s=re.sub(r'int flags\s*=\s*data\.getFlags\(\)\s*&\s*\([^;]+\);',
 '''int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);''',s)
-s=s.replace('setTypeface(null,1)','setTypeface(null,Typeface.BOLD)')
+s=s.replace('setTypeface(null,1)','setTypeface(null,android.graphics.Typeface.BOLD)')
 p.write_text(s)
 
 # Share receiver Typeface
