@@ -1,4 +1,4 @@
-name: BIGGER OTG v6.6 - GERAR APK
+name: BIGGER OTG v7.0 - AUDITORIA E BUILD
 on:
   workflow_dispatch:
   push:
@@ -57,6 +57,15 @@ jobs:
       - name: Aplicar correção v6.6
         run: python3 v6/patch_v66.py
 
+      - name: Aplicar hardening principal v7
+        run: python3 v7/patch_core_v7.py
+
+      - name: Aplicar hardening APK v7
+        run: python3 v7/patch_apps_v7.py
+
+      - name: Aplicar hardening compartilhamento v7
+        run: python3 v7/patch_share_v7.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
@@ -68,6 +77,10 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Android Lint
+        working-directory: buildsrc
+        run: gradle :app:lintDebug --stacktrace
+
       - name: Compilar APK
         working-directory: buildsrc
         run: gradle :app:assembleDebug --stacktrace
@@ -76,13 +89,13 @@ jobs:
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           mkdir -p output
-          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v6.6.apk
-          unzip -t output/BIGGER-OTG-v6.6.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v6.6.apk
-          ls -lh output/BIGGER-OTG-v6.6.apk
-          sha256sum output/BIGGER-OTG-v6.6.apk
+          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v7.0.apk
+          unzip -t output/BIGGER-OTG-v7.0.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v7.0.apk
+          ls -lh output/BIGGER-OTG-v7.0.apk
+          sha256sum output/BIGGER-OTG-v7.0.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BIGGER-OTG-v6.6-APK
-          path: output/BIGGER-OTG-v6.6.apk
+          name: BIGGER-OTG-v7.0-APK
+          path: output/BIGGER-OTG-v7.0.apk
