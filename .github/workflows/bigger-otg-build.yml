@@ -1,4 +1,4 @@
-name: BIGGER OTG v7.2 - AUDITORIA E BUILD
+name: BIGGER OTG v7.3 - AUDITORIA E BUILD
 on:
   workflow_dispatch:
   push:
@@ -81,6 +81,9 @@ jobs:
       - name: Aplicar recursos v7.2
         run: python3 v7/patch_v72.py
 
+      - name: Aplicar correção de scroll v7.3
+        run: python3 v7/patch_v73_scroll.py
+
       - name: Configurar Android SDK
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
@@ -110,13 +113,13 @@ jobs:
         run: |
           export ANDROID_HOME=/usr/local/lib/android/sdk
           mkdir -p output
-          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v7.2.apk
-          unzip -t output/BIGGER-OTG-v7.2.apk
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v7.2.apk
-          ls -lh output/BIGGER-OTG-v7.2.apk
-          sha256sum output/BIGGER-OTG-v7.2.apk
+          cp buildsrc/app/build/outputs/apk/debug/app-debug.apk output/BIGGER-OTG-v7.3.apk
+          unzip -t output/BIGGER-OTG-v7.3.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs output/BIGGER-OTG-v7.3.apk
+          ls -lh output/BIGGER-OTG-v7.3.apk
+          sha256sum output/BIGGER-OTG-v7.3.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: BIGGER-OTG-v7.2-APK
-          path: output/BIGGER-OTG-v7.2.apk
+          name: BIGGER-OTG-v7.3-APK
+          path: output/BIGGER-OTG-v7.3.apk
